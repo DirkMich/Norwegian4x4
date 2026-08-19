@@ -123,7 +123,7 @@ private fun Label(text: String, color: Color = MistGray) {
 private fun Container(
     modifier: Modifier = Modifier,
     tint: Color = SlateSurface,
-    content: @Composable ColumnScopeContent,
+    content: ColumnScopeContent,
 ) {
     Column(
         modifier
