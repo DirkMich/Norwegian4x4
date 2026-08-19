@@ -1,0 +1,252 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.example.norwegian4x4"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="30"
+9        android:targetSdkVersion="34" />
+10
+11    <uses-feature android:name="android.hardware.type.watch" />
+11-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:4:5-64
+11-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:4:19-61
+12
+13    <uses-permission android:name="android.permission.BODY_SENSORS" />
+13-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:6:5-71
+13-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:6:22-68
+14    <uses-permission android:name="android.permission.INTERNET" />
+14-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:7:5-67
+14-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:7:22-64
+15    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+15-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:8:5-79
+15-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:8:22-76
+16    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+16-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:9:5-79
+16-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:9:22-76
+17    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+17-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:10:5-77
+17-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:10:22-74
+18    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+18-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:11:5-77
+18-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:11:22-74
+19    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" />
+19-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:12:5-84
+19-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:12:22-81
+20    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+20-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:13:5-86
+20-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:13:22-83
+21    <uses-permission android:name="android.permission.WAKE_LOCK" />
+21-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:14:5-68
+21-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:14:22-65
+22    <uses-permission android:name="android.permission.VIBRATE" />
+22-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:15:5-66
+22-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:15:22-63
+23
+24    <queries>
+24-->[androidx.health:health-services-client:1.1.0-alpha05] C:\Users\Dirk\.gradle\caches\8.9\transforms\1419c27e49ccbe86edaf6049d71a599f\transformed\health-services-client-1.1.0-alpha05\AndroidManifest.xml:19:5-21:15
+25        <package android:name="com.google.android.wearable.healthservices" />
+25-->[androidx.health:health-services-client:1.1.0-alpha05] C:\Users\Dirk\.gradle\caches\8.9\transforms\1419c27e49ccbe86edaf6049d71a599f\transformed\health-services-client-1.1.0-alpha05\AndroidManifest.xml:20:9-78
+25-->[androidx.health:health-services-client:1.1.0-alpha05] C:\Users\Dirk\.gradle\caches\8.9\transforms\1419c27e49ccbe86edaf6049d71a599f\transformed\health-services-client-1.1.0-alpha05\AndroidManifest.xml:20:18-75
+26    </queries>
+27
+28    <permission
+28-->[androidx.core:core:1.13.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\5cd7ad6226c423e75c5a3b7e2c03e406\transformed\core-1.13.1\AndroidManifest.xml:22:5-24:47
+29        android:name="com.example.norwegian4x4.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+29-->[androidx.core:core:1.13.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\5cd7ad6226c423e75c5a3b7e2c03e406\transformed\core-1.13.1\AndroidManifest.xml:23:9-81
+30        android:protectionLevel="signature" />
+30-->[androidx.core:core:1.13.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\5cd7ad6226c423e75c5a3b7e2c03e406\transformed\core-1.13.1\AndroidManifest.xml:24:9-44
+31
+32    <uses-permission android:name="com.example.norwegian4x4.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+32-->[androidx.core:core:1.13.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\5cd7ad6226c423e75c5a3b7e2c03e406\transformed\core-1.13.1\AndroidManifest.xml:26:5-97
+32-->[androidx.core:core:1.13.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\5cd7ad6226c423e75c5a3b7e2c03e406\transformed\core-1.13.1\AndroidManifest.xml:26:22-94
+33
+34    <application
+34-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:17:5-60:19
+35        android:allowBackup="true"
+35-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:18:9-35
+36        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+36-->[androidx.core:core:1.13.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\5cd7ad6226c423e75c5a3b7e2c03e406\transformed\core-1.13.1\AndroidManifest.xml:28:18-86
+37        android:debuggable="true"
+38        android:extractNativeLibs="false"
+39        android:icon="@mipmap/ic_launcher"
+39-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:19:9-43
+40        android:label="@string/app_name"
+40-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:20:9-41
+41        android:roundIcon="@mipmap/ic_launcher_round"
+41-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:21:9-54
+42        android:supportsRtl="true"
+42-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:22:9-35
+43        android:testOnly="true"
+44        android:theme="@android:style/Theme.DeviceDefault" >
+44-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:23:9-59
+45        <uses-library
+45-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:25:9-27:39
+46            android:name="com.google.android.wearable"
+46-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:26:13-55
+47            android:required="true" />
+47-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:27:13-36
+48
+49        <!-- Standalone app: does not require a phone companion app -->
+50        <meta-data
+50-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:30:9-32:36
+51            android:name="com.google.android.wearable.standalone"
+51-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:31:13-66
+52            android:value="true" />
+52-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:32:13-33
+53
+54        <activity
+54-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:34:9-41:20
+55            android:name="com.example.norwegian4x4.MainActivity"
+55-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:35:13-41
+56            android:exported="true" >
+56-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:36:13-36
+57            <intent-filter>
+57-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:37:13-40:29
+58                <action android:name="android.intent.action.MAIN" />
+58-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:38:17-69
+58-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:38:25-66
+59
+60                <category android:name="android.intent.category.LAUNCHER" />
+60-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:39:17-77
+60-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:39:27-74
+61            </intent-filter>
+62        </activity>
+63
+64        <service
+64-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:43:9-46:63
+65            android:name="com.example.norwegian4x4.ExerciseService"
+65-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:44:13-44
+66            android:exported="false"
+66-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:45:13-37
+67            android:foregroundServiceType="health|location" />
+67-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:46:13-60
+68        <service
+68-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:48:9-58:19
+69            android:name="com.example.norwegian4x4.SettingsListenerService"
+69-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:49:13-52
+70            android:exported="true" >
+70-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:50:13-36
+71            <intent-filter>
+71-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:51:13-57:29
+72                <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
+72-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:52:17-87
+72-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:52:25-84
+73
+74                <data
+74-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:53:17-56:54
+75                    android:host="*"
+75-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:55:21-37
+76                    android:pathPrefix="/settings"
+76-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:56:21-51
+77                    android:scheme="wear" />
+77-->C:\Users\Dirk\StudioProjects\Norwegian4x4\wear\src\main\AndroidManifest.xml:54:21-42
+78            </intent-filter>
+79        </service>
+80        <service
+80-->[androidx.health:health-services-client:1.1.0-alpha05] C:\Users\Dirk\.gradle\caches\8.9\transforms\1419c27e49ccbe86edaf6049d71a599f\transformed\health-services-client-1.1.0-alpha05\AndroidManifest.xml:24:9-31:19
+81            android:name="androidx.health.services.client.VersionApiService"
+81-->[androidx.health:health-services-client:1.1.0-alpha05] C:\Users\Dirk\.gradle\caches\8.9\transforms\1419c27e49ccbe86edaf6049d71a599f\transformed\health-services-client-1.1.0-alpha05\AndroidManifest.xml:25:13-77
+82            android:exported="true"
+82-->[androidx.health:health-services-client:1.1.0-alpha05] C:\Users\Dirk\.gradle\caches\8.9\transforms\1419c27e49ccbe86edaf6049d71a599f\transformed\health-services-client-1.1.0-alpha05\AndroidManifest.xml:26:13-36
+83            android:permission="com.google.android.wearable.healthservices.permission.PASSIVE_DATA_BINDING" >
+83-->[androidx.health:health-services-client:1.1.0-alpha05] C:\Users\Dirk\.gradle\caches\8.9\transforms\1419c27e49ccbe86edaf6049d71a599f\transformed\health-services-client-1.1.0-alpha05\AndroidManifest.xml:27:13-108
+84            <intent-filter>
+84-->[androidx.health:health-services-client:1.1.0-alpha05] C:\Users\Dirk\.gradle\caches\8.9\transforms\1419c27e49ccbe86edaf6049d71a599f\transformed\health-services-client-1.1.0-alpha05\AndroidManifest.xml:28:13-30:29
+85                <action android:name="hs.versionclient.BIND" />
+85-->[androidx.health:health-services-client:1.1.0-alpha05] C:\Users\Dirk\.gradle\caches\8.9\transforms\1419c27e49ccbe86edaf6049d71a599f\transformed\health-services-client-1.1.0-alpha05\AndroidManifest.xml:29:17-64
+85-->[androidx.health:health-services-client:1.1.0-alpha05] C:\Users\Dirk\.gradle\caches\8.9\transforms\1419c27e49ccbe86edaf6049d71a599f\transformed\health-services-client-1.1.0-alpha05\AndroidManifest.xml:29:25-61
+86            </intent-filter>
+87        </service>
+88
+89        <uses-library
+89-->[androidx.wear.compose:compose-foundation:1.4.0] C:\Users\Dirk\.gradle\caches\8.9\transforms\16820737b5df0bb3831d43f1654c5cb9\transformed\compose-foundation-1.4.0\AndroidManifest.xml:23:9-25:40
+90            android:name="wear-sdk"
+90-->[androidx.wear.compose:compose-foundation:1.4.0] C:\Users\Dirk\.gradle\caches\8.9\transforms\16820737b5df0bb3831d43f1654c5cb9\transformed\compose-foundation-1.4.0\AndroidManifest.xml:24:13-36
+91            android:required="false" />
+91-->[androidx.wear.compose:compose-foundation:1.4.0] C:\Users\Dirk\.gradle\caches\8.9\transforms\16820737b5df0bb3831d43f1654c5cb9\transformed\compose-foundation-1.4.0\AndroidManifest.xml:25:13-37
+92
+93        <activity
+93-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\Dirk\.gradle\caches\8.9\transforms\b13fb5edab805d98ce0a2fbf598e8c0b\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:9-173
+94            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+94-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\Dirk\.gradle\caches\8.9\transforms\b13fb5edab805d98ce0a2fbf598e8c0b\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:19-85
+95            android:exported="false"
+95-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\Dirk\.gradle\caches\8.9\transforms\b13fb5edab805d98ce0a2fbf598e8c0b\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:146-170
+96            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+96-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\Dirk\.gradle\caches\8.9\transforms\b13fb5edab805d98ce0a2fbf598e8c0b\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:86-145
+97
+98        <meta-data
+98-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\Dirk\.gradle\caches\8.9\transforms\712b51ca0fa88d02bf5259d74ad6483f\transformed\play-services-basement-18.4.0\AndroidManifest.xml:6:9-122
+99            android:name="com.google.android.gms.version"
+99-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\Dirk\.gradle\caches\8.9\transforms\712b51ca0fa88d02bf5259d74ad6483f\transformed\play-services-basement-18.4.0\AndroidManifest.xml:6:20-65
+100            android:value="@integer/google_play_services_version" />
+100-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\Dirk\.gradle\caches\8.9\transforms\712b51ca0fa88d02bf5259d74ad6483f\transformed\play-services-basement-18.4.0\AndroidManifest.xml:6:66-119
+101
+102        <provider
+102-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Dirk\.gradle\caches\8.9\transforms\91dafd708a8ee95ef95fa36639d5817a\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
+103            android:name="androidx.startup.InitializationProvider"
+103-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Dirk\.gradle\caches\8.9\transforms\91dafd708a8ee95ef95fa36639d5817a\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
+104            android:authorities="com.example.norwegian4x4.androidx-startup"
+104-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Dirk\.gradle\caches\8.9\transforms\91dafd708a8ee95ef95fa36639d5817a\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
+105            android:exported="false" >
+105-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Dirk\.gradle\caches\8.9\transforms\91dafd708a8ee95ef95fa36639d5817a\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
+106            <meta-data
+106-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Dirk\.gradle\caches\8.9\transforms\91dafd708a8ee95ef95fa36639d5817a\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
+107                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+107-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Dirk\.gradle\caches\8.9\transforms\91dafd708a8ee95ef95fa36639d5817a\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
+108                android:value="androidx.startup" />
+108-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Dirk\.gradle\caches\8.9\transforms\91dafd708a8ee95ef95fa36639d5817a\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
+109            <meta-data
+109-->[androidx.lifecycle:lifecycle-process:2.8.6] C:\Users\Dirk\.gradle\caches\8.9\transforms\e902c3dc4e89450113db2af2b96c4dc6\transformed\lifecycle-process-2.8.6\AndroidManifest.xml:29:13-31:52
+110                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+110-->[androidx.lifecycle:lifecycle-process:2.8.6] C:\Users\Dirk\.gradle\caches\8.9\transforms\e902c3dc4e89450113db2af2b96c4dc6\transformed\lifecycle-process-2.8.6\AndroidManifest.xml:30:17-78
+111                android:value="androidx.startup" />
+111-->[androidx.lifecycle:lifecycle-process:2.8.6] C:\Users\Dirk\.gradle\caches\8.9\transforms\e902c3dc4e89450113db2af2b96c4dc6\transformed\lifecycle-process-2.8.6\AndroidManifest.xml:31:17-49
+112            <meta-data
+112-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\540be8a05d5cf66a6c12ec8c5625a117\transformed\profileinstaller-1.3.1\AndroidManifest.xml:29:13-31:52
+113                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+113-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\540be8a05d5cf66a6c12ec8c5625a117\transformed\profileinstaller-1.3.1\AndroidManifest.xml:30:17-85
+114                android:value="androidx.startup" />
+114-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\540be8a05d5cf66a6c12ec8c5625a117\transformed\profileinstaller-1.3.1\AndroidManifest.xml:31:17-49
+115        </provider>
+116
+117        <receiver
+117-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\540be8a05d5cf66a6c12ec8c5625a117\transformed\profileinstaller-1.3.1\AndroidManifest.xml:34:9-52:20
+118            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+118-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\540be8a05d5cf66a6c12ec8c5625a117\transformed\profileinstaller-1.3.1\AndroidManifest.xml:35:13-76
+119            android:directBootAware="false"
+119-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\540be8a05d5cf66a6c12ec8c5625a117\transformed\profileinstaller-1.3.1\AndroidManifest.xml:36:13-44
+120            android:enabled="true"
+120-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\540be8a05d5cf66a6c12ec8c5625a117\transformed\profileinstaller-1.3.1\AndroidManifest.xml:37:13-35
+121            android:exported="true"
+121-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\540be8a05d5cf66a6c12ec8c5625a117\transformed\profileinstaller-1.3.1\AndroidManifest.xml:38:13-36
+122            android:permission="android.permission.DUMP" >
+122-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\540be8a05d5cf66a6c12ec8c5625a117\transformed\profileinstaller-1.3.1\AndroidManifest.xml:39:13-57
+123            <intent-filter>
+123-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\540be8a05d5cf66a6c12ec8c5625a117\transformed\profileinstaller-1.3.1\AndroidManifest.xml:40:13-42:29
+124                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+124-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\540be8a05d5cf66a6c12ec8c5625a117\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:17-91
+124-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\540be8a05d5cf66a6c12ec8c5625a117\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:25-88
+125            </intent-filter>
+126            <intent-filter>
+126-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\540be8a05d5cf66a6c12ec8c5625a117\transformed\profileinstaller-1.3.1\AndroidManifest.xml:43:13-45:29
+127                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+127-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\540be8a05d5cf66a6c12ec8c5625a117\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:17-85
+127-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\540be8a05d5cf66a6c12ec8c5625a117\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:25-82
+128            </intent-filter>
+129            <intent-filter>
+129-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\540be8a05d5cf66a6c12ec8c5625a117\transformed\profileinstaller-1.3.1\AndroidManifest.xml:46:13-48:29
+130                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+130-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\540be8a05d5cf66a6c12ec8c5625a117\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:17-88
+130-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\540be8a05d5cf66a6c12ec8c5625a117\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:25-85
+131            </intent-filter>
+132            <intent-filter>
+132-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\540be8a05d5cf66a6c12ec8c5625a117\transformed\profileinstaller-1.3.1\AndroidManifest.xml:49:13-51:29
+133                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+133-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\540be8a05d5cf66a6c12ec8c5625a117\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:17-95
+133-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\Dirk\.gradle\caches\8.9\transforms\540be8a05d5cf66a6c12ec8c5625a117\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:25-92
+134            </intent-filter>
+135        </receiver>
+136    </application>
+137
+138</manifest>
