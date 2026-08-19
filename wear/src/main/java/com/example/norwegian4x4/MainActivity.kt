@@ -3,6 +3,7 @@ package com.example.norwegian4x4
 import android.Manifest
 import android.content.Intent
 import android.os.Bundle
+import android.view.KeyEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -34,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
@@ -77,6 +80,20 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+    /** Wear OS side/stem buttons — toggle pause/resume during a workout instead of the default action. */
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        val state = ExerciseService.state.value
+        val isSideButton = keyCode == KeyEvent.KEYCODE_STEM_1 ||
+            keyCode == KeyEvent.KEYCODE_STEM_2 ||
+            keyCode == KeyEvent.KEYCODE_STEM_3 ||
+            keyCode == KeyEvent.KEYCODE_BACK
+        if (state.running && isSideButton) {
+            sendAction(if (state.paused) ExerciseService.ACTION_RESUME else ExerciseService.ACTION_PAUSE)
+            return true
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -111,6 +128,15 @@ class MainActivity : ComponentActivity() {
 }
 
 // ------------------------------------------------------------- shared bits
+
+/**
+ * Horizontal inset that keeps content clear of the bezel. Round screens clip a
+ * plain rectangular Column near the top/bottom corners, so they need noticeably
+ * more side padding than square ones to keep edge content from being cut off.
+ */
+@Composable
+private fun edgePadding(): androidx.compose.ui.unit.Dp =
+    if (LocalConfiguration.current.isScreenRound) 18.dp else 8.dp
 
 /** Small uppercase label — quiet by design so the big numbers next to it carry the eye. */
 @Composable
@@ -182,7 +208,10 @@ private fun HomeScreen(error: String?, onStart: () -> Unit, onSettings: () -> Un
     val intervals = Prefs.getIntervals(context)
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = edgePadding(), vertical = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -204,14 +233,14 @@ private fun HomeScreen(error: String?, onStart: () -> Unit, onSettings: () -> Un
             onClick = onStart,
             label = { Text("START", fontWeight = FontWeight.Black, letterSpacing = 1.sp, fontSize = 15.sp) },
             colors = ChipDefaults.primaryChipColors(),
-            modifier = Modifier.height(44.dp),
+            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
         )
         Spacer(Modifier.height(6.dp))
         Chip(
             onClick = onSettings,
             label = { Text("Settings", fontSize = 12.sp) },
             colors = ChipDefaults.secondaryChipColors(),
-            modifier = Modifier.height(30.dp),
+            modifier = Modifier.fillMaxWidth().heightIn(min = 40.dp),
         )
         if (error != null) {
             Spacer(Modifier.height(6.dp))
@@ -233,7 +262,7 @@ private fun SettingsScreen(onBack: () -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 14.dp, vertical = 26.dp),
+            .padding(horizontal = edgePadding(), vertical = 26.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text("SETTINGS", fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.8.sp, color = FrostWhite)
@@ -244,7 +273,7 @@ private fun SettingsScreen(onBack: () -> Unit) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Button(
                     onClick = { maxHr = (maxHr - 1).coerceAtLeast(120); Prefs.setMaxHr(context, maxHr) },
-                    modifier = Modifier.size(32.dp),
+                    modifier = Modifier.size(36.dp),
                     colors = ButtonDefaults.secondaryButtonColors(),
                 ) { Text("-", fontSize = 16.sp) }
                 Text(
@@ -256,7 +285,7 @@ private fun SettingsScreen(onBack: () -> Unit) {
                 )
                 Button(
                     onClick = { maxHr = (maxHr + 1).coerceAtMost(220); Prefs.setMaxHr(context, maxHr) },
-                    modifier = Modifier.size(32.dp),
+                    modifier = Modifier.size(36.dp),
                     colors = ButtonDefaults.secondaryButtonColors(),
                 ) { Text("+", fontSize = 16.sp) }
             }
@@ -274,7 +303,7 @@ private fun SettingsScreen(onBack: () -> Unit) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Button(
                     onClick = { intervals = (intervals - 1).coerceAtLeast(1); Prefs.setIntervals(context, intervals) },
-                    modifier = Modifier.size(32.dp),
+                    modifier = Modifier.size(36.dp),
                     colors = ButtonDefaults.secondaryButtonColors(),
                 ) { Text("-", fontSize = 16.sp) }
                 Text(
@@ -286,7 +315,7 @@ private fun SettingsScreen(onBack: () -> Unit) {
                 )
                 Button(
                     onClick = { intervals = (intervals + 1).coerceAtMost(8); Prefs.setIntervals(context, intervals) },
-                    modifier = Modifier.size(32.dp),
+                    modifier = Modifier.size(36.dp),
                     colors = ButtonDefaults.secondaryButtonColors(),
                 ) { Text("+", fontSize = 16.sp) }
             }
@@ -301,6 +330,7 @@ private fun SettingsScreen(onBack: () -> Unit) {
             },
             label = { Text("Screen always on: ${if (screenOn) "ON" else "OFF"}", fontSize = 12.sp) },
             colors = ChipDefaults.secondaryChipColors(),
+            modifier = Modifier.fillMaxWidth().heightIn(min = 40.dp),
         )
         Text(
             if (screenOn) "Display stays lit all workout (more battery)"
@@ -315,6 +345,7 @@ private fun SettingsScreen(onBack: () -> Unit) {
             onClick = onBack,
             label = { Text("DONE", fontWeight = FontWeight.Black, letterSpacing = 0.5.sp) },
             colors = ChipDefaults.primaryChipColors(),
+            modifier = Modifier.fillMaxWidth().heightIn(min = 44.dp),
         )
     }
 }
@@ -350,7 +381,10 @@ private fun WorkoutScreen(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(horizontal = 10.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = edgePadding(), vertical = 14.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -358,21 +392,19 @@ private fun WorkoutScreen(
         Spacer(Modifier.height(4.dp))
         Text(
             formatClock(state.secondsLeft),
-            fontSize = 44.sp,
+            fontSize = 38.sp,
             fontWeight = FontWeight.Black,
             color = if (state.paused) PausedAmber else FrostWhite,
         )
-        Box(Modifier.fillMaxWidth().height(22.dp), contentAlignment = Alignment.Center) {
-            HrWaveform(state.hrHistory, guidanceColor, Modifier.fillMaxWidth().height(20.dp))
-        }
+        HrWaveform(state.hrHistory, guidanceColor, Modifier.fillMaxWidth().height(16.dp))
         Row(verticalAlignment = Alignment.Bottom) {
             Text(
                 if (state.hr > 0) "${state.hr}" else "--",
-                fontSize = 30.sp,
+                fontSize = 26.sp,
                 fontWeight = FontWeight.Black,
                 color = guidanceColor,
             )
-            Text(" bpm  (${state.targetLow}–${state.targetHigh})", fontSize = 11.sp, color = MistGray)
+            Text(" bpm  (${state.targetLow}–${state.targetHigh})", fontSize = 10.sp, color = MistGray)
         }
         Spacer(Modifier.height(2.dp))
         Pill(guidanceText, tint = guidanceColor.copy(alpha = 0.22f), onTint = guidanceColor)
@@ -387,20 +419,19 @@ private fun WorkoutScreen(
             )
         }
         Spacer(Modifier.height(8.dp))
-        Row {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             Chip(
                 onClick = if (state.paused) onResume else onPause,
-                label = { Text(if (state.paused) "Resume" else "Pause", fontSize = 11.sp, fontWeight = FontWeight.Bold) },
+                label = { Text(if (state.paused) "Resume" else "Pause", fontSize = 12.sp, fontWeight = FontWeight.Bold) },
                 colors = if (state.paused) ChipDefaults.primaryChipColors()
                 else ChipDefaults.secondaryChipColors(),
-                modifier = Modifier.height(32.dp),
+                modifier = Modifier.weight(1f).heightIn(min = 40.dp),
             )
-            Spacer(Modifier.width(6.dp))
             Chip(
                 onClick = onEnd,
-                label = { Text("End", fontSize = 11.sp, fontWeight = FontWeight.Bold) },
+                label = { Text("End", fontSize = 12.sp, fontWeight = FontWeight.Bold) },
                 colors = ChipDefaults.secondaryChipColors(),
-                modifier = Modifier.height(32.dp),
+                modifier = Modifier.weight(1f).heightIn(min = 40.dp),
             )
         }
     }
@@ -418,7 +449,7 @@ private fun SummaryScreen(state: WorkoutState, onDone: () -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 12.dp, vertical = 18.dp),
+            .padding(horizontal = edgePadding(), vertical = 18.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text("WORKOUT COMPLETE", fontSize = 12.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.8.sp, color = IceBlue)
@@ -489,6 +520,7 @@ private fun SummaryScreen(state: WorkoutState, onDone: () -> Unit) {
             onClick = onDone,
             label = { Text("DONE", fontWeight = FontWeight.Black, letterSpacing = 0.5.sp) },
             colors = ChipDefaults.primaryChipColors(),
+            modifier = Modifier.fillMaxWidth().heightIn(min = 44.dp),
         )
     }
 }
