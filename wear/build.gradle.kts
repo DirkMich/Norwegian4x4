@@ -53,9 +53,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-service:2.8.6")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.6")
 
-    // HTTP client for direct Strava upload
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-
     // Data Layer: send workouts to the phone companion app
     implementation("com.google.android.gms:play-services-wearable:18.2.0")
 }

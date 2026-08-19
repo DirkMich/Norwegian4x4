@@ -3,6 +3,7 @@ package com.example.norwegian4x4.phone
 import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -24,10 +26,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.CloudDone
+import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.ShowChart
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,57 +46,73 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
+import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
-private val ZoneGreen = Color(0xFF43A047)
-private val ZoneOrange = Color(0xFFFB8C00)
-private val ChartBlue = Color(0xFF1E88E5)
 
 class PhoneActivity : ComponentActivity() {
 
     private val notifPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
 
+    private val redirectUri = mutableStateOf<Uri?>(null)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (Build.VERSION.SDK_INT >= 33) {
             notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
+        redirectUri.value = intent?.data
         setContent {
-            MaterialTheme {
-                PhoneApp()
+            Norwegian4x4Theme {
+                PhoneApp(redirectUri)
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        redirectUri.value = intent.data
     }
 }
 
 // ---------------------------------------------------------------------- app
 
 @Composable
-private fun PhoneApp() {
+private fun PhoneApp(redirectUri: MutableState<Uri?>) {
+    val context = LocalContext.current
     var tab by remember { mutableIntStateOf(0) }
+
+    // A Strava OAuth redirect can land while the user is on any tab.
+    LaunchedEffect(redirectUri.value) {
+        val uri = redirectUri.value ?: return@LaunchedEffect
+        runCatching { StravaClient.handleRedirect(context, uri) }
+        redirectUri.value = null
+    }
+
     Scaffold(
         bottomBar = {
             NavigationBar {
@@ -126,6 +149,7 @@ private fun PhoneApp() {
 @Composable
 private fun WorkoutsTab() {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val changeTick by History.changes.collectAsState()
     val entries = remember(changeTick) { History.load(context) }
     val dateFmt = remember { SimpleDateFormat("EEE d MMM yyyy, HH:mm", Locale.getDefault()) }
@@ -142,7 +166,7 @@ private fun WorkoutsTab() {
                 "Finish a workout on your watch and it will appear here automatically " +
                     "(phone and watch connected via Bluetooth).",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray,
+                color = MistGray,
             )
         }
         return
@@ -150,9 +174,13 @@ private fun WorkoutsTab() {
 
     LazyColumn(Modifier.fillMaxSize().padding(horizontal = 12.dp)) {
         items(entries) { e ->
-            Card(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+                shape = MaterialTheme.shapes.large,
+                colors = CardDefaults.cardColors(containerColor = SlateSurface),
+            ) {
                 Row(
-                    Modifier.padding(12.dp),
+                    Modifier.padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Column(Modifier.weight(1f)) {
@@ -160,19 +188,20 @@ private fun WorkoutsTab() {
                         Text(
                             String.format(
                                 Locale.getDefault(),
-                                "%.2f km \u2022 %s \u2022 avg %d bpm",
+                                "%.2f km • %s • avg %d bpm",
                                 e.distanceM / 1000.0, clock(e.durationSec), e.avgHr,
                             ),
                             style = MaterialTheme.typography.bodyMedium,
                         )
                         if (e.workAvgHr.isNotEmpty()) {
                             Text(
-                                "Intervals: " + e.workAvgHr.joinToString(" \u2022 ") { "$it" } + " bpm",
+                                "Intervals: " + e.workAvgHr.joinToString(" • ") { "$it" } + " bpm",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = Color.Gray,
+                                color = MistGray,
                             )
                         }
                     }
+                    StravaUploadButton(context, scope, e)
                     IconButton(onClick = { shareTcx(context, e.filename) }) {
                         Icon(Icons.Filled.Share, contentDescription = "Share TCX")
                     }
@@ -181,12 +210,61 @@ private fun WorkoutsTab() {
         }
         item {
             Text(
-                "Tap share, or find the files in Download/Norwegian4x4. " +
-                    "Upload at strava.com/upload in your browser.",
+                "Tap the cloud icon to upload straight to Strava (connect it first in " +
+                    "Settings), or share the file another way.",
                 style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray,
+                color = MistGray,
                 modifier = Modifier.padding(vertical = 12.dp),
             )
+        }
+    }
+}
+
+@Composable
+private fun StravaUploadButton(
+    context: Context,
+    scope: kotlinx.coroutines.CoroutineScope,
+    entry: History.Entry,
+) {
+    var uploading by remember(entry.time) { mutableStateOf(false) }
+    var error by remember(entry.time) { mutableStateOf<String?>(null) }
+
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        when {
+            entry.uploadedToStrava -> {
+                Icon(Icons.Filled.CloudDone, contentDescription = "Uploaded to Strava", tint = IceBlue)
+            }
+            uploading -> {
+                CircularProgressIndicator(modifier = Modifier.size(22.dp), strokeWidth = 2.dp, color = IceBlue)
+            }
+            else -> {
+                IconButton(onClick = {
+                    if (!StravaClient.isConnected(context)) {
+                        error = "Connect Strava in Settings"
+                        return@IconButton
+                    }
+                    uploading = true
+                    error = null
+                    scope.launch {
+                        val file = File(History.workoutsDir(context), entry.filename)
+                        val result = StravaClient.upload(
+                            context = context,
+                            file = file,
+                            name = "Norwegian 4x4",
+                            description = "Recorded on Galaxy Watch",
+                        )
+                        uploading = false
+                        result
+                            .onSuccess { History.markUploaded(context, entry.time) }
+                            .onFailure { error = it.message ?: "Upload failed" }
+                    }
+                }) {
+                    Icon(Icons.Filled.CloudUpload, contentDescription = "Upload to Strava")
+                }
+            }
+        }
+        error?.let {
+            Text(it, fontSize = 9.sp, color = AlertRed)
         }
     }
 }
@@ -221,11 +299,11 @@ private fun ProgressTab() {
         Text("Progress", style = MaterialTheme.typography.headlineSmall)
         Spacer(Modifier.height(4.dp))
         Text(
-            "${entries.size} workouts \u2022 " +
+            "${entries.size} workouts • " +
                 String.format(Locale.getDefault(), "%.1f km", totalKm) +
-                " \u2022 $totalMin min total",
+                " • $totalMin min total",
             style = MaterialTheme.typography.bodyMedium,
-            color = Color.Gray,
+            color = MistGray,
         )
         Spacer(Modifier.height(20.dp))
 
@@ -233,7 +311,7 @@ private fun ProgressTab() {
             Text(
                 "Charts appear after two or more workouts.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray,
+                color = MistGray,
             )
             return@Column
         }
@@ -241,10 +319,10 @@ private fun ProgressTab() {
         // Chart 1: average heart rate across hard intervals, with target zone band.
         Text("Avg interval heart rate", style = MaterialTheme.typography.titleMedium)
         Text(
-            "The green band is your 85\u201395% work zone. In-zone but with faster " +
+            "The blue band is your 85–95% work zone. In-zone but with faster " +
                 "pace over time = fitness improving.",
             style = MaterialTheme.typography.bodySmall,
-            color = Color.Gray,
+            color = MistGray,
         )
         Spacer(Modifier.height(8.dp))
         val hrValues = entries.map { e ->
@@ -268,12 +346,12 @@ private fun ProgressTab() {
             modifier = Modifier.fillMaxWidth().height(180.dp),
         )
         Spacer(Modifier.height(12.dp))
-        HorizontalDivider()
+        HorizontalDivider(color = SlateSurfaceHigh)
         Spacer(Modifier.height(12.dp))
         Text(
             "Oldest workout on the left, newest on the right.",
             style = MaterialTheme.typography.bodySmall,
-            color = Color.Gray,
+            color = MistGray,
         )
     }
 }
@@ -294,21 +372,21 @@ private fun LineChart(
 
         band?.let {
             drawRect(
-                color = ZoneGreen.copy(alpha = 0.15f),
+                color = IceBlue.copy(alpha = 0.15f),
                 topLeft = Offset(0f, y(it.endInclusive)),
                 size = Size(size.width, y(it.start) - y(it.endInclusive)),
             )
         }
         for (i in 0 until values.size - 1) {
             drawLine(
-                color = ChartBlue,
+                color = IceBlue,
                 start = Offset(x(i), y(values[i])),
                 end = Offset(x(i + 1), y(values[i + 1])),
                 strokeWidth = 5f,
             )
         }
         values.forEachIndexed { i, v ->
-            drawCircle(ChartBlue, radius = 9f, center = Offset(x(i), y(v)))
+            drawCircle(IceBlue, radius = 9f, center = Offset(x(i), y(v)))
         }
     }
 }
@@ -322,10 +400,10 @@ private fun BarChart(values: List<Float>, unit: String, modifier: Modifier = Mod
         values.forEachIndexed { i, v ->
             val h = size.height * (v / max)
             drawRoundRect(
-                color = ZoneOrange,
+                color = SignalAmber,
                 topLeft = Offset(slot * i + (slot - barWidth) / 2f, size.height - h),
                 size = Size(barWidth, h),
-                cornerRadius = CornerRadius(8f, 8f),
+                cornerRadius = CornerRadius(barWidth * 0.3f, barWidth * 0.3f),
             )
         }
     }
@@ -354,13 +432,13 @@ private fun SettingsTab() {
         Text(
             "Changes sync to the watch automatically over Bluetooth.",
             style = MaterialTheme.typography.bodySmall,
-            color = Color.Gray,
+            color = MistGray,
         )
         Spacer(Modifier.height(20.dp))
 
         StepperRow(
             title = "Max heart rate",
-            subtitle = "Work zone ${(maxHr * 0.85).toInt()}\u2013${(maxHr * 0.95).toInt()} bpm",
+            subtitle = "Work zone ${(maxHr * 0.85).toInt()}–${(maxHr * 0.95).toInt()} bpm",
             value = maxHr,
             onChange = { maxHr = it.coerceIn(120, 220); save() },
         )
@@ -378,18 +456,60 @@ private fun SettingsTab() {
                 Text(
                     if (screenOn) "Easier to glance, more battery" else "Raise wrist to check",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray,
+                    color = MistGray,
                 )
             }
             Switch(checked = screenOn, onCheckedChange = { screenOn = it; save() })
         }
+
+        Spacer(Modifier.height(24.dp))
+        HorizontalDivider(color = SlateSurfaceHigh)
+        StravaSection()
+
         Spacer(Modifier.height(24.dp))
         Text(
             "Note: settings can also be changed on the watch itself; whichever " +
                 "was changed last wins.",
             style = MaterialTheme.typography.bodySmall,
-            color = Color.Gray,
+            color = MistGray,
         )
+    }
+}
+
+@Composable
+private fun StravaSection() {
+    val context = LocalContext.current
+    val tick by StravaClient.connectionChanges.collectAsState()
+    val connected = remember(tick) { StravaClient.isConnected(context) }
+
+    Spacer(Modifier.height(16.dp))
+    Text("Strava", style = MaterialTheme.typography.titleMedium)
+    Text(
+        if (connected) "Connected — upload finished workouts from the Workouts tab."
+        else "Connect once so the Workouts tab can upload straight to Strava.",
+        style = MaterialTheme.typography.bodySmall,
+        color = MistGray,
+    )
+    Spacer(Modifier.height(10.dp))
+    if (connected) {
+        OutlinedButton(
+            onClick = { StravaClient.disconnect(context) },
+            shape = MaterialTheme.shapes.small,
+        ) { Text("Disconnect") }
+    } else {
+        Button(
+            onClick = { context.startActivity(StravaClient.authorizeIntent()) },
+            enabled = StravaSecrets.isConfigured,
+            shape = MaterialTheme.shapes.small,
+        ) { Text("Connect Strava") }
+        if (!StravaSecrets.isConfigured) {
+            Spacer(Modifier.height(6.dp))
+            Text(
+                "Add your Strava API keys to StravaSecrets.kt first (see SETUP_GUIDE.md).",
+                style = MaterialTheme.typography.bodySmall,
+                color = AlertRed,
+            )
+        }
     }
 }
 
@@ -398,17 +518,17 @@ private fun StepperRow(title: String, subtitle: String, value: Int, onChange: (I
     Row(verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) {
             Text(title, style = MaterialTheme.typography.titleSmall)
-            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MistGray)
         }
-        OutlinedButton(onClick = { onChange(value - 1) }) { Text("\u2212") }
+        OutlinedButton(onClick = { onChange(value - 1) }, shape = MaterialTheme.shapes.small) { Text("−") }
         Text(
             "$value",
             modifier = Modifier.width(56.dp),
             style = MaterialTheme.typography.titleLarge,
-            fontSize = 22.sp,
+            fontSize = 24.sp,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
         )
-        OutlinedButton(onClick = { onChange(value + 1) }) { Text("+") }
+        OutlinedButton(onClick = { onChange(value + 1) }, shape = MaterialTheme.shapes.small) { Text("+") }
     }
 }
 

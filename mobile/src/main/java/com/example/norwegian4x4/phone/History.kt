@@ -21,6 +21,7 @@ object History {
         val maxHrSetting: Int,
         val workAvgHr: List<Int>,
         val filename: String,
+        val uploadedToStrava: Boolean = false,
     )
 
     /** Bumped whenever the history changes; collect to refresh UI. */
@@ -64,10 +65,26 @@ object History {
                     maxHrSetting = o.optInt("maxHrSetting", 190),
                     workAvgHr = work,
                     filename = o.optString("filename"),
+                    uploadedToStrava = o.optBoolean("uploadedToStrava", false),
                 )
             )
         }
         return list.sortedByDescending { it.time }
+    }
+
+    /** Marks a workout as uploaded so the checkmark persists across app restarts. */
+    @Synchronized
+    fun markUploaded(context: Context, time: Long) {
+        val arr = readArray(context)
+        for (i in 0 until arr.length()) {
+            val o = arr.getJSONObject(i)
+            if (o.optLong("time") == time) {
+                o.put("uploadedToStrava", true)
+                break
+            }
+        }
+        historyFile(context).writeText(arr.toString())
+        changes.value = System.currentTimeMillis()
     }
 
     private fun readArray(context: Context): JSONArray {
