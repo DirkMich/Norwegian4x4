@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
@@ -80,14 +81,18 @@ class MainActivity : ComponentActivity() {
         )
     }
 
-    /** Wear OS side/stem buttons — toggle pause/resume during a workout instead of the default action. */
+    /**
+     * Wear OS stem buttons — toggle pause/resume during a workout. The back-mapped
+     * side button on most watches is handled separately via [BackHandler] below:
+     * Android also routes KEYCODE_BACK through onKeyUp/the back dispatcher on its
+     * own, so consuming it only here would still let the default back action fire.
+     */
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         val state = ExerciseService.state.value
-        val isSideButton = keyCode == KeyEvent.KEYCODE_STEM_1 ||
+        val isStemButton = keyCode == KeyEvent.KEYCODE_STEM_1 ||
             keyCode == KeyEvent.KEYCODE_STEM_2 ||
-            keyCode == KeyEvent.KEYCODE_STEM_3 ||
-            keyCode == KeyEvent.KEYCODE_BACK
-        if (state.running && isSideButton) {
+            keyCode == KeyEvent.KEYCODE_STEM_3
+        if (state.running && isStemButton) {
             sendAction(if (state.paused) ExerciseService.ACTION_RESUME else ExerciseService.ACTION_PAUSE)
             return true
         }
@@ -104,6 +109,12 @@ class MainActivity : ComponentActivity() {
             val view = LocalView.current
             LaunchedEffect(state.running) {
                 view.keepScreenOn = state.running && Prefs.getScreenOn(context)
+            }
+
+            // While a workout is running, the back gesture/button pauses instead of
+            // navigating away — otherwise it would both pause AND leave the screen.
+            BackHandler(enabled = state.running) {
+                sendAction(if (state.paused) ExerciseService.ACTION_RESUME else ExerciseService.ACTION_PAUSE)
             }
 
             Norwegian4x4Theme {
@@ -155,7 +166,7 @@ private fun Container(
         modifier
             .clip(RoundedCornerShape(ContainerRadius))
             .background(tint)
-            .padding(horizontal = 14.dp, vertical = 10.dp),
+            .padding(horizontal = 14.dp, vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         content = content,
     )
@@ -210,41 +221,40 @@ private fun HomeScreen(error: String?, onStart: () -> Unit, onSettings: () -> Un
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = edgePadding(), vertical = 20.dp),
+            .padding(horizontal = edgePadding(), vertical = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Text("NORWEGIAN 4X4", fontSize = 14.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.5.sp, color = FrostWhite)
-        Spacer(Modifier.height(8.dp))
+        Text("NORWEGIAN 4X4", fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 0.5.sp, color = FrostWhite)
+        Spacer(Modifier.height(6.dp))
         Container {
-            Text("$intervals", fontSize = 34.sp, fontWeight = FontWeight.Black, color = IceBlue)
+            Text("$intervals", fontSize = 28.sp, fontWeight = FontWeight.Black, color = IceBlue)
             Label("intervals • ~${workoutMinutes(intervals)} min")
             Spacer(Modifier.height(2.dp))
             Text(
                 "Zone ${(maxHr * 0.85).toInt()}–${(maxHr * 0.95).toInt()} bpm",
-                fontSize = 11.sp,
+                fontSize = 10.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = SignalAmber,
             )
         }
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(8.dp))
         Chip(
             onClick = onStart,
-            label = { Text("START", fontWeight = FontWeight.Black, letterSpacing = 1.sp, fontSize = 15.sp) },
+            label = { Text("START", fontWeight = FontWeight.Black, letterSpacing = 1.sp, fontSize = 14.sp) },
             colors = ChipDefaults.primaryChipColors(),
-            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
+            modifier = Modifier.fillMaxWidth().heightIn(min = 44.dp),
         )
-        Spacer(Modifier.height(6.dp))
+        Spacer(Modifier.height(4.dp))
         Chip(
             onClick = onSettings,
             label = { Text("Settings", fontSize = 12.sp) },
             colors = ChipDefaults.secondaryChipColors(),
-            modifier = Modifier.fillMaxWidth().heightIn(min = 40.dp),
+            modifier = Modifier.fillMaxWidth().heightIn(min = 36.dp),
         )
         if (error != null) {
-            Spacer(Modifier.height(6.dp))
-            Text(error, fontSize = 10.sp, color = AlertRed, textAlign = TextAlign.Center)
+            Spacer(Modifier.height(4.dp))
+            Text(error, fontSize = 9.sp, color = AlertRed, textAlign = TextAlign.Center)
         }
     }
 }
@@ -383,55 +393,53 @@ private fun WorkoutScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = edgePadding(), vertical = 14.dp),
+            .padding(horizontal = edgePadding(), vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
         Pill(state.phaseLabel.uppercase(), tint = phaseColor.copy(alpha = 0.22f), onTint = phaseColor)
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(2.dp))
         Text(
             formatClock(state.secondsLeft),
-            fontSize = 38.sp,
+            fontSize = 34.sp,
             fontWeight = FontWeight.Black,
             color = if (state.paused) PausedAmber else FrostWhite,
         )
-        HrWaveform(state.hrHistory, guidanceColor, Modifier.fillMaxWidth().height(16.dp))
+        HrWaveform(state.hrHistory, guidanceColor, Modifier.fillMaxWidth().height(12.dp))
         Row(verticalAlignment = Alignment.Bottom) {
             Text(
                 if (state.hr > 0) "${state.hr}" else "--",
-                fontSize = 26.sp,
+                fontSize = 23.sp,
                 fontWeight = FontWeight.Black,
                 color = guidanceColor,
             )
-            Text(" bpm  (${state.targetLow}–${state.targetHigh})", fontSize = 10.sp, color = MistGray)
+            Text(" bpm  (${state.targetLow}–${state.targetHigh})", fontSize = 9.sp, color = MistGray)
         }
-        Spacer(Modifier.height(2.dp))
         Pill(guidanceText, tint = guidanceColor.copy(alpha = 0.22f), onTint = guidanceColor)
-        Spacer(Modifier.height(6.dp))
+        Spacer(Modifier.height(3.dp))
         Row {
-            Text("${formatPace(state.speedMps)} /km", fontSize = 12.sp, color = FrostWhite)
+            Text("${formatPace(state.speedMps)} /km", fontSize = 11.sp, color = FrostWhite)
             Spacer(Modifier.width(10.dp))
             Text(
                 String.format(java.util.Locale.US, "%.2f km", state.distanceM / 1000.0),
-                fontSize = 12.sp,
+                fontSize = 11.sp,
                 color = FrostWhite,
             )
         }
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(6.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             Chip(
                 onClick = if (state.paused) onResume else onPause,
                 label = { Text(if (state.paused) "Resume" else "Pause", fontSize = 12.sp, fontWeight = FontWeight.Bold) },
                 colors = if (state.paused) ChipDefaults.primaryChipColors()
                 else ChipDefaults.secondaryChipColors(),
-                modifier = Modifier.weight(1f).heightIn(min = 40.dp),
+                modifier = Modifier.weight(1f).heightIn(min = 38.dp),
             )
             Chip(
                 onClick = onEnd,
                 label = { Text("End", fontSize = 12.sp, fontWeight = FontWeight.Bold) },
                 colors = ChipDefaults.secondaryChipColors(),
-                modifier = Modifier.weight(1f).heightIn(min = 40.dp),
+                modifier = Modifier.weight(1f).heightIn(min = 38.dp),
             )
         }
     }
