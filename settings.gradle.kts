@@ -14,4 +14,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Norwegian4x4"
-include(":app")
+include(":wear")
+include(":mobile")

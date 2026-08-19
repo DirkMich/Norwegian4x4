@@ -1,0 +1,2 @@
+- [x] Update mobile/src/main/AndroidManifest.xml with icon attributes
+- [x] Update wear/src/main/AndroidManifest.xml with icon attributes

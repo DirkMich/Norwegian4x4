@@ -1,14 +1,20 @@
-# Norwegian 4x4 — Setup Guide (Galaxy Watch 7)
+# Norwegian 4x4 — Setup Guide (Galaxy Watch 7 + phone companion)
 
-This guide takes you from zero to running the app on your watch and uploading workouts to Strava. No prior Android experience needed. Expect about 45–60 minutes the first time (mostly downloads); after that, installing updates takes seconds.
+This project contains **two apps**: the watch app (module `wear`) and a phone companion app (module `mobile`). The watch runs the workout; the phone receives every workout automatically over Bluetooth, keeps your history and progress charts, controls the settings, and makes sharing to Strava a 20-second job.
 
-## What the app does
+## What the apps do
 
-- **Workout structure:** 10 min warm-up → 4 × (4 min hard + 3 min recovery) → 5 min cool-down. Total ~44 minutes.
-- **Live display:** interval countdown, current heart rate in color, SPEED UP / IN ZONE / SLOW DOWN guidance, current pace (min/km) and distance.
-- **Zones:** the hard intervals target 85–95% of your max HR (which you enter on the start screen); recoveries target 60–75%.
-- **Haptics:** triple buzz = hard interval starting, double buzz = recovery starting, long buzz = workout done.
-- **Strava:** every workout is saved as a `.tcx` file with GPS track, heart rate, distance, and one lap per phase. After a one-time setup (step 6), an **Upload to Strava** button on the watch sends it straight to Strava.
+**Watch (wear):**
+- Workout structure: 10 min warm-up → N × (4 min hard + 3 min recovery) → 5 min cool-down. N is configurable (1–8).
+- Live display: interval countdown, heart rate in color, SPEED UP / IN ZONE / SLOW DOWN guidance, pace (min/km), distance. Pause/Resume/End buttons.
+- Hard intervals target 85–95% of your max HR; recoveries 60–75%. Haptics on every phase change.
+- Saves each workout as a Strava-compatible `.tcx` (GPS route, HR, distance, one lap per phase) and sends it to the phone automatically.
+
+**Phone (mobile):**
+- Gets a notification when a workout arrives (works even with the app closed; the file is also copied to `Download/Norwegian4x4/`).
+- **Workouts tab:** your history with per-interval average HR, and a Share button for each TCX.
+- **Progress tab:** charts of average interval heart rate (with your target zone drawn as a band) and distance per workout.
+- **Settings tab:** max HR, interval count, and always-on-screen — synced to the watch automatically.
 
 ---
 
@@ -16,117 +22,64 @@ This guide takes you from zero to running the app on your watch and uploading wo
 
 1. Download Android Studio from https://developer.android.com/studio and install it (default options are fine).
 2. On first launch, the setup wizard downloads the Android SDK. Accept the licenses and let it finish.
+3. If Gradle later complains about the JVM/JDK version: File → Settings → Build Tools → Gradle → set **Gradle JDK** to the embedded **jbr** (JetBrains Runtime).
 
 ## Step 2 — Open the project
 
-1. Unzip `Norwegian4x4.zip` somewhere permanent (e.g. Documents).
-2. In Android Studio: **File → Open** and select the `Norwegian4x4` folder (the one containing `settings.gradle.kts`).
-3. If asked to "Trust the project", say yes.
-4. Wait for **Gradle sync** to finish (progress bar at the bottom). The first sync downloads Gradle and all libraries — 5–15 minutes depending on your connection. Later syncs are fast.
+1. Unzip `Norwegian4x4.zip` somewhere permanent and open the `Norwegian4x4` folder (the one containing `settings.gradle.kts`) via **File → Open**.
+2. Let Gradle sync finish (first time: 5–15 min). Afterwards the run-configuration dropdown at the top shows **wear** and **mobile** — that's how you choose which app to build.
 
-## Step 3 — Enable developer mode on the watch
+## Step 3 — Enable developer mode
 
-On your Galaxy Watch 7:
+**On the watch:** Settings → About watch → Software information → tap **Software version** 5 times → back → **Developer options** → enable **ADB debugging** and **Wireless debugging** (watch on the same Wi-Fi as your computer).
 
-1. **Settings → About watch → Software information**, then tap **Software version** 5 times quickly. You'll see "Developer mode turned on".
-2. Go back to **Settings → Developer options** (now visible at the bottom).
-3. Turn on **ADB debugging** and **Wireless debugging** (agree to the prompts). The watch and your computer must be on the **same Wi-Fi network**.
+**On your phone:** Settings → About phone → Software information → tap **Build number** 7 times → back → **Developer options** → enable **USB debugging**.
 
-## Step 4 — Connect the watch to Android Studio
+## Step 4 — Install the watch app
 
-1. On the watch: **Developer options → Wireless debugging → Pair new device**. It shows a pairing code plus an IP address and port (e.g. `192.168.1.42:40001`).
-2. In Android Studio, open the **Terminal** tab (bottom of the window) and run, using the values from your watch:
+1. Watch: Developer options → Wireless debugging → **Pair new device** (shows a code + IP:port).
+2. Android Studio Terminal: `adb pair <ip:port>` and enter the code, then `adb connect <ip:port>` using the IP:port from the Wireless debugging main screen (a different port).
+3. Select the **wear** configuration + your watch in the device dropdown, press **Run ▶**.
+4. First start: grant the sensor/location/notification permissions on the watch.
 
-   ```
-   adb pair 192.168.1.42:40001
-   ```
+## Step 5 — Install the phone app
 
-   Enter the 6-digit pairing code when asked.
-3. Back on the **Wireless debugging** main screen the watch shows a second IP:port (a *different* port than the pairing one). Connect to that one:
+1. Connect your phone with a **USB cable**. Accept the "Allow USB debugging?" prompt on the phone.
+2. Select the **mobile** configuration + your phone in the device dropdown, press **Run ▶**.
+3. Allow notifications when the app asks — that's how you're told a workout arrived.
 
-   ```
-   adb connect 192.168.1.42:37000
-   ```
+Both apps are now permanently installed; you only reconnect to install updates. Important: install both from the same computer (they must carry the same debug signature to talk to each other).
 
-   You should see `connected to ...`. The watch now appears in the device dropdown at the top of Android Studio.
+## Step 6 — The workflow after a run
 
-   *Tip: if `adb` isn't found, in Android Studio go to Tools → SDK Manager, note the SDK path, and use `<sdk-path>/platform-tools/adb` — or just restart the Terminal tab.*
+1. Finish the workout on the watch (or tap End). The watch shows "Sent to phone ✓".
+2. Your phone gets a **"Workout received"** notification within moments (watch and phone connected via Bluetooth as usual). If the phone wasn't reachable, the workout is queued and delivered automatically when they reconnect.
+3. Open the notification → **Workouts tab** → tap **Share** on the workout → send it wherever is handy, or skip the share entirely: the file is already in **Download/Norwegian4x4/** on your phone.
+4. In your phone's browser, go to **strava.com/upload**, pick the file, done. Strava shows the route, pace, HR, and every interval as its own lap.
 
-## Step 5 — Install and run
+Uploading this way is a normal Strava user feature and completely free — it does not use the paid developer API. (The watch still contains optional direct-upload code in `StravaSecrets.kt`, but since June 2026 Strava's API requires a paid subscription, so leave it unconfigured unless you subscribe someday.)
 
-1. Select your watch in the device dropdown at the top of Android Studio.
-2. Press the green **Run ▶** button. The app builds and launches on the watch (first build takes a few minutes).
-3. On the watch, when you press **Start workout** the first time, grant the permission prompts (body sensors, location, notifications). All are required — HR guidance needs the sensor, pace/distance need GPS.
+## Using the watch app
 
-## Step 6 — Direct Strava upload (one-time setup, ~10 minutes)
-
-After this setup, an **Upload to Strava** button appears on the watch after every workout — no computer needed anymore. (The TCX file is still saved on the watch as a backup either way.)
-
-**A. Create your Strava API app**
-
-1. Log in at https://www.strava.com/settings/api and create an app:
-   - Application name: anything (e.g. `Watch4x4`) — note it may not contain the word "Strava"
-   - Category: anything, Website: `http://localhost`
-   - **Authorization Callback Domain: `localhost`** (this one matters)
-2. After saving you'll see your **Client ID** (a number) and **Client Secret** (long string). Keep this page open.
-
-**B. Authorize it once**
-
-1. Paste this into your browser, replacing `YOUR_ID` with your Client ID:
-
-   ```
-   https://www.strava.com/oauth/authorize?client_id=YOUR_ID&response_type=code&redirect_uri=http://localhost&approval_prompt=force&scope=activity:write,read
-   ```
-
-2. Click **Authorize**. Your browser will land on a "can't reach localhost" error page — that's expected. Look at the **address bar**: it contains `code=xxxxxxxx`. Copy that code (everything between `code=` and `&`).
-3. In the Android Studio Terminal, run (all one line, fill in your three values):
-
-   ```
-   curl.exe -X POST https://www.strava.com/api/v3/oauth/token -d client_id=YOUR_ID -d client_secret=YOUR_SECRET -d code=THE_CODE -d grant_type=authorization_code
-   ```
-
-   (On Windows use `curl.exe`, not `curl`.) The JSON response contains `"refresh_token": "..."` — copy that value. The code from step 2 is single-use; if you get an error, redo step 1–2 for a fresh code.
-
-**C. Put the values in the app**
-
-1. Open `app/src/main/java/com/example/norwegian4x4/StravaSecrets.kt` and paste your Client ID, Client Secret, and refresh token into the three constants.
-2. Press **Run ▶** to reinstall on the watch. Done — after each workout, tap **Upload to Strava** on the summary screen.
-
-Tokens rotate automatically from here on; you never repeat this setup. Keep `StravaSecrets.kt` private (don't post it anywhere) — it grants write access to your Strava account.
-
-## Step 6b — Manual fallback: TCX via adb
-
-If an upload fails (no network) or you skipped the Strava setup, every workout is still on the watch:
-
-1. `adb connect <ip:port>` if not connected (the port can change after a reboot).
-2. In the Android Studio Terminal:
-
-   ```
-   adb pull /sdcard/Android/data/com.example.norwegian4x4/files/ ./workouts
-   ```
-
-3. Upload the `.tcx` file at **https://www.strava.com/upload/select**. Strava will show the run with your route, pace, heart rate, and each interval as its own lap.
-
-## Using the app
-
-1. Open **Settings** on the start screen to set **your max HR** (a rough estimate is 220 minus your age, but a measured value gives much better zone targets), the **number of hard intervals** (1–8; the start screen shows the resulting total time), and whether the **screen stays always on** during workouts (ON is easier to glance at; OFF saves battery — raise your wrist to check).
-2. Tap **Start workout**, wait outside for a few seconds so GPS can lock, and go.
-3. During hard intervals the HR number and guidance text turn **blue (speed up)**, **green (in zone)**, or **red (slow down)**. During warm-up/cool-down it only warns you if you're going too hard.
-4. **Pause** freezes the interval timer and the recording; **Resume** continues where you left off. Tap **End** to stop early — the file is still saved.
+1. Set max HR and interval count in the phone app's Settings (or on the watch — last change wins). If you don't know your max HR, 220 minus your age is a rough start.
+2. Tap **Start workout**, wait a few seconds outdoors for GPS, and go.
+3. Blue = speed up, green = in zone, red = slow down. During warm-up/cool-down it only warns when you're going too hard.
+4. **Pause** freezes timer and recording; **End** stops early (the file is still saved and sent).
 
 ## Troubleshooting
 
-- **Gradle sync fails:** check your internet connection, then File → Sync Project with Gradle Files. If it mentions the JDK, go to Settings → Build Tools → Gradle and set the Gradle JDK to the embedded JDK (17).
-- **HR shows "--" for a long time:** tighten the strap one notch and give it 15–30 seconds; the optical sensor needs skin contact.
-- **Pace/distance stay at zero:** GPS has no fix yet. Start outdoors with a clear sky view; the first fix after install can take a minute or two.
-- **Watch disappeared from the device list:** run `adb connect <ip:port>` again (check the current port under Wireless debugging).
-- **"Upload to Strava" fails:** the watch needs internet. Connected to your phone via Bluetooth it normally routes through the phone; if that fails, connect the watch to Wi-Fi (Settings → Connections → Wi-Fi) and retry. An auth error (HTTP 400/401) means a value in `StravaSecrets.kt` is wrong — redo the authorization steps for a fresh refresh token.
-- **Build errors in the code:** copy the exact error message back into our chat and I'll fix it.
+- **Gradle sync fails:** check internet, then File → Sync Project with Gradle Files. JDK complaints → Step 1.3.
+- **HR shows "--":** tighten the strap one notch and give it 15–30 seconds.
+- **Pace/distance stay at zero:** GPS has no fix yet; start outdoors, first fix can take a minute.
+- **Workout doesn't reach the phone:** check the watch is connected to the phone in the Galaxy Wearable app (Bluetooth). The transfer retries automatically on reconnect. Make sure both apps were installed from the same computer, and that the phone app has been opened at least once.
+- **Settings don't sync to the watch:** same Bluetooth check; then change the setting again.
+- **Watch/phone disappeared from Android Studio:** watch → `adb connect <ip:port>` again (port changes after reboot); phone → replug USB.
+- **Build errors:** copy the exact error message back into our chat and I'll fix it.
 
 ## Customizing
 
-All workout structure lives in one place: `app/src/main/java/com/example/norwegian4x4/Workout.kt` → `buildNorwegian4x4()`. Change durations or zone percentages there, then press Run again to reinstall. Max HR, interval count, and always-on screen are in the app's Settings menu.
+Workout structure (durations, zone percentages): `wear/src/main/java/com/example/norwegian4x4/Workout.kt` → `buildNorwegian4x4()`. Everything else is in the Settings tab.
 
 ## Later upgrades (just ask)
 
-- Audio cues through Bluetooth earbuds, ambient (always-on-display) rendering, workout history on the watch, auto-upload without pressing the button.
+- Audio cues through earbuds, more charts (pace trends, time-in-zone), workout notes, auto-opening the Strava upload page, an app icon.
