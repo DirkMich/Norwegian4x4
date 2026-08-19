@@ -12,9 +12,11 @@ This project contains **two apps**: the watch app (module `wear`) and a phone co
 
 **Phone (mobile):**
 - Gets a notification when a workout arrives (works even with the app closed; the file is also copied to `Download/Norwegian4x4/`).
-- **Workouts tab:** your history with per-interval average HR, and a Share button for each TCX.
+- **Workouts tab:** your history with per-interval average HR, a cloud-upload button that sends the workout straight to Strava (once connected), and a Share button for each TCX.
 - **Progress tab:** charts of average interval heart rate (with your target zone drawn as a band) and distance per workout.
-- **Settings tab:** max HR, interval count, and always-on-screen — synced to the watch automatically.
+- **Settings tab:** max HR, interval count, always-on-screen (synced to the watch automatically), and the Strava connect/disconnect control.
+
+The watch never talks to Strava directly — it only hands the finished workout to the phone over Bluetooth. All Strava auth and uploading happens on the phone.
 
 ---
 
@@ -54,16 +56,25 @@ Both apps are now permanently installed; you only reconnect to install updates. 
 
 1. Finish the workout on the watch (or tap End). The watch shows "Sent to phone ✓".
 2. Your phone gets a **"Workout received"** notification within moments (watch and phone connected via Bluetooth as usual). If the phone wasn't reachable, the workout is queued and delivered automatically when they reconnect.
-3. Open the notification → **Workouts tab** → tap **Share** on the workout → send it wherever is handy, or skip the share entirely: the file is already in **Download/Norwegian4x4/** on your phone.
-4. In your phone's browser, go to **strava.com/upload**, pick the file, done. Strava shows the route, pace, HR, and every interval as its own lap.
+3. Open the notification → **Workouts tab**. From here you have two ways to get it onto Strava:
+   - Tap the **cloud icon** on the workout to upload it directly (see "Connecting Strava" below to set this up first).
+   - Or tap **Share** and send it wherever is handy — or skip the share entirely, the file is already in **Download/Norwegian4x4/** on your phone; go to **strava.com/upload** in a browser and pick it.
 
-Uploading this way is a normal Strava user feature and completely free — it does not use the paid developer API. (The watch still contains optional direct-upload code in `StravaSecrets.kt`, but since June 2026 Strava's API requires a paid subscription, so leave it unconfigured unless you subscribe someday.)
+### Connecting Strava
+
+Direct upload uses Strava's API, which has required a **paid Strava API subscription since June 2026** — the same restriction as before, just now enforced on the phone side instead of the watch. If you have that subscription:
+
+1. Create a free API app at https://www.strava.com/settings/api (the Authorization Callback Domain field can be left as anything — this app uses an in-app custom-scheme redirect, not a website).
+2. Copy the **Client ID** and **Client Secret** into `mobile/src/main/java/com/example/norwegian4x4/phone/StravaSecrets.kt`, then reinstall the phone app.
+3. In the phone app, **Settings → Connect Strava**. You'll be sent to Strava's consent screen in your browser and dropped straight back into the app once you approve.
+
+If you'd rather not pay for API access, just use the Share button — that path is a normal Strava user feature and stays completely free.
 
 ## Using the watch app
 
 1. Set max HR and interval count in the phone app's Settings (or on the watch — last change wins). If you don't know your max HR, 220 minus your age is a rough start.
 2. Tap **Start workout**, wait a few seconds outdoors for GPS, and go.
-3. Blue = speed up, green = in zone, red = slow down. During warm-up/cool-down it only warns when you're going too hard.
+3. Ice blue = speed up or in zone (the guidance text tells you which), red = slow down. During warm-up/cool-down it only warns when you're going too hard.
 4. **Pause** freezes timer and recording; **End** stops early (the file is still saved and sent).
 
 ## Troubleshooting

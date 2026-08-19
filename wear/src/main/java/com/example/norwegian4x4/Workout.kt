@@ -61,6 +61,8 @@ data class WorkoutState(
     val savedFile: String? = null,
     val error: String? = null,
     val summary: WorkoutSummary? = null,
+    /** Most recent HR samples (oldest first), for the live waveform readout. */
+    val hrHistory: List<Int> = emptyList(),
 )
 
 /** Per-hard-interval breakdown shown on the end-of-workout summary. */

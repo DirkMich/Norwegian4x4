@@ -9,43 +9,46 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 /**
- * "Glacial Precision" palette for the High-Contrast Utilitarian design language —
- * shared visual language with the watch app, adapted to Material3 tokens.
+ * M3 Expressive meets Nordic performance — shared visual language with the
+ * watch app. Deep obsidian base, slate-tinted expressive containers, one
+ * vibrant ice-blue accent, and generous rounded corners over hard borders.
  */
-val Ink = Color(0xFF05090C)
-val Panel = Color(0xFF10171F)
-val Hairline = Color(0xFF2A3742)
-val IceWhite = Color(0xFFEDF4F7)
-val SteelGray = Color(0xFF7C8FA0)
-val GlacialCyan = Color(0xFF29E1EA)
-val FrostBlue = Color(0xFF5AA8E0)
+val Obsidian = Color(0xFF0B0F17)
+val SlateSurface = Color(0xFF1E2630)
+val SlateSurfaceHigh = Color(0xFF283241)
+val FrostWhite = Color(0xFFF4F8FB)
+val MistGray = Color(0xFF8FA0B3)
+val IceBlue = Color(0xFF00D2FF)
 val SignalAmber = Color(0xFFFFB020)
 val AlertRed = Color(0xFFFF4B4B)
 
 private val GlacialScheme = darkColorScheme(
-    primary = GlacialCyan,
-    onPrimary = Ink,
-    secondary = FrostBlue,
-    onSecondary = Ink,
+    primary = IceBlue,
+    onPrimary = Obsidian,
+    secondary = SlateSurfaceHigh,
+    onSecondary = FrostWhite,
     tertiary = SignalAmber,
-    onTertiary = Ink,
-    background = Ink,
-    onBackground = IceWhite,
-    surface = Panel,
-    onSurface = IceWhite,
-    surfaceVariant = Panel,
-    onSurfaceVariant = SteelGray,
-    outline = Hairline,
+    onTertiary = Obsidian,
+    background = Obsidian,
+    onBackground = FrostWhite,
+    surface = SlateSurface,
+    onSurface = FrostWhite,
+    surfaceVariant = SlateSurface,
+    onSurfaceVariant = MistGray,
+    outline = SlateSurfaceHigh,
     error = AlertRed,
-    onError = Ink,
+    onError = Obsidian,
 )
 
+/** Expressive M3 container radius (24-28dp). */
+private val ContainerRadius = 26.dp
+
 private val GlacialShapes = Shapes(
-    extraSmall = RoundedCornerShape(2.dp),
-    small = RoundedCornerShape(2.dp),
-    medium = RoundedCornerShape(4.dp),
-    large = RoundedCornerShape(4.dp),
-    extraLarge = RoundedCornerShape(4.dp),
+    extraSmall = RoundedCornerShape(percent = 50),
+    small = RoundedCornerShape(percent = 50),
+    medium = RoundedCornerShape(18.dp),
+    large = RoundedCornerShape(ContainerRadius),
+    extraLarge = RoundedCornerShape(ContainerRadius),
 )
 
 @Composable

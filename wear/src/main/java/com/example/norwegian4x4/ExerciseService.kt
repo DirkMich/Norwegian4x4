@@ -68,6 +68,10 @@ class ExerciseService : LifecycleService() {
 
     private val samples = mutableListOf<TrackSample>()
 
+    /** Rolling window of recent HR readings driving the live waveform. */
+    private val hrHistory = ArrayDeque<Int>()
+    private val hrHistorySize = 40
+
     private val exerciseClient by lazy { HealthServices.getClient(this).exerciseClient }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -124,6 +128,7 @@ class ExerciseService : LifecycleService() {
         elapsed = 0
         paused = false
         samples.clear()
+        hrHistory.clear()
         startTimeMs = System.currentTimeMillis()
 
         exerciseClient.setUpdateCallback(updateCallback)
@@ -191,6 +196,9 @@ class ExerciseService : LifecycleService() {
                 delay(1000)
                 elapsed++
                 phaseElapsed++
+
+                hrHistory.addLast(lastHr)
+                while (hrHistory.size > hrHistorySize) hrHistory.removeFirst()
 
                 // Record one sample per second for the TCX file.
                 samples.add(
@@ -275,6 +283,7 @@ class ExerciseService : LifecycleService() {
             speedMps = lastSpeed,
             distanceM = totalDistance,
             elapsedSec = elapsed,
+            hrHistory = hrHistory.toList(),
         )
     }
 

@@ -50,4 +50,7 @@ dependencies {
 
     // Data Layer: receive workouts from the watch
     implementation("com.google.android.gms:play-services-wearable:18.2.0")
+
+    // HTTP client for the Strava upload
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 }
