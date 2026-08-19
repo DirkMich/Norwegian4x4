@@ -8,7 +8,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,6 +30,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.ShowChart
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -63,10 +66,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-private val ZoneGreen = Color(0xFF43A047)
-private val ZoneOrange = Color(0xFFFB8C00)
-private val ChartBlue = Color(0xFF1E88E5)
-
 class PhoneActivity : ComponentActivity() {
 
     private val notifPermission =
@@ -78,7 +77,7 @@ class PhoneActivity : ComponentActivity() {
             notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
         setContent {
-            MaterialTheme {
+            Norwegian4x4Theme {
                 PhoneApp()
             }
         }
@@ -142,7 +141,7 @@ private fun WorkoutsTab() {
                 "Finish a workout on your watch and it will appear here automatically " +
                     "(phone and watch connected via Bluetooth).",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray,
+                color = SteelGray,
             )
         }
         return
@@ -150,7 +149,13 @@ private fun WorkoutsTab() {
 
     LazyColumn(Modifier.fillMaxSize().padding(horizontal = 12.dp)) {
         items(entries) { e ->
-            Card(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 6.dp)
+                    .border(BorderStroke(1.dp, Hairline), MaterialTheme.shapes.small),
+                colors = CardDefaults.cardColors(containerColor = Panel),
+            ) {
                 Row(
                     Modifier.padding(12.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -169,7 +174,7 @@ private fun WorkoutsTab() {
                             Text(
                                 "Intervals: " + e.workAvgHr.joinToString(" \u2022 ") { "$it" } + " bpm",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = Color.Gray,
+                                color = SteelGray,
                             )
                         }
                     }
@@ -184,7 +189,7 @@ private fun WorkoutsTab() {
                 "Tap share, or find the files in Download/Norwegian4x4. " +
                     "Upload at strava.com/upload in your browser.",
                 style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray,
+                color = SteelGray,
                 modifier = Modifier.padding(vertical = 12.dp),
             )
         }
@@ -225,7 +230,7 @@ private fun ProgressTab() {
                 String.format(Locale.getDefault(), "%.1f km", totalKm) +
                 " \u2022 $totalMin min total",
             style = MaterialTheme.typography.bodyMedium,
-            color = Color.Gray,
+            color = SteelGray,
         )
         Spacer(Modifier.height(20.dp))
 
@@ -233,7 +238,7 @@ private fun ProgressTab() {
             Text(
                 "Charts appear after two or more workouts.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray,
+                color = SteelGray,
             )
             return@Column
         }
@@ -244,7 +249,7 @@ private fun ProgressTab() {
             "The green band is your 85\u201395% work zone. In-zone but with faster " +
                 "pace over time = fitness improving.",
             style = MaterialTheme.typography.bodySmall,
-            color = Color.Gray,
+            color = SteelGray,
         )
         Spacer(Modifier.height(8.dp))
         val hrValues = entries.map { e ->
@@ -273,7 +278,7 @@ private fun ProgressTab() {
         Text(
             "Oldest workout on the left, newest on the right.",
             style = MaterialTheme.typography.bodySmall,
-            color = Color.Gray,
+            color = SteelGray,
         )
     }
 }
@@ -294,21 +299,21 @@ private fun LineChart(
 
         band?.let {
             drawRect(
-                color = ZoneGreen.copy(alpha = 0.15f),
+                color = GlacialCyan.copy(alpha = 0.15f),
                 topLeft = Offset(0f, y(it.endInclusive)),
                 size = Size(size.width, y(it.start) - y(it.endInclusive)),
             )
         }
         for (i in 0 until values.size - 1) {
             drawLine(
-                color = ChartBlue,
+                color = FrostBlue,
                 start = Offset(x(i), y(values[i])),
                 end = Offset(x(i + 1), y(values[i + 1])),
                 strokeWidth = 5f,
             )
         }
         values.forEachIndexed { i, v ->
-            drawCircle(ChartBlue, radius = 9f, center = Offset(x(i), y(v)))
+            drawCircle(FrostBlue, radius = 9f, center = Offset(x(i), y(v)))
         }
     }
 }
@@ -322,10 +327,10 @@ private fun BarChart(values: List<Float>, unit: String, modifier: Modifier = Mod
         values.forEachIndexed { i, v ->
             val h = size.height * (v / max)
             drawRoundRect(
-                color = ZoneOrange,
+                color = SignalAmber,
                 topLeft = Offset(slot * i + (slot - barWidth) / 2f, size.height - h),
                 size = Size(barWidth, h),
-                cornerRadius = CornerRadius(8f, 8f),
+                cornerRadius = CornerRadius(1f, 1f),
             )
         }
     }
@@ -354,7 +359,7 @@ private fun SettingsTab() {
         Text(
             "Changes sync to the watch automatically over Bluetooth.",
             style = MaterialTheme.typography.bodySmall,
-            color = Color.Gray,
+            color = SteelGray,
         )
         Spacer(Modifier.height(20.dp))
 
@@ -378,7 +383,7 @@ private fun SettingsTab() {
                 Text(
                     if (screenOn) "Easier to glance, more battery" else "Raise wrist to check",
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray,
+                    color = SteelGray,
                 )
             }
             Switch(checked = screenOn, onCheckedChange = { screenOn = it; save() })
@@ -388,7 +393,7 @@ private fun SettingsTab() {
             "Note: settings can also be changed on the watch itself; whichever " +
                 "was changed last wins.",
             style = MaterialTheme.typography.bodySmall,
-            color = Color.Gray,
+            color = SteelGray,
         )
     }
 }
@@ -398,7 +403,7 @@ private fun StepperRow(title: String, subtitle: String, value: Int, onChange: (I
     Row(verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) {
             Text(title, style = MaterialTheme.typography.titleSmall)
-            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = SteelGray)
         }
         OutlinedButton(onClick = { onChange(value - 1) }) { Text("\u2212") }
         Text(

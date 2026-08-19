@@ -6,11 +6,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -30,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -43,13 +48,6 @@ import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import kotlinx.coroutines.launch
 import java.io.File
-
-private val ColorInZone = Color(0xFF66BB6A)
-private val ColorSpeedUp = Color(0xFF42A5F5)
-private val ColorSlowDown = Color(0xFFEF5350)
-private val ColorWork = Color(0xFFFFA726)
-private val ColorEasy = Color(0xFF80CBC4)
-private val ColorPaused = Color(0xFFFFCA28)
 
 class MainActivity : ComponentActivity() {
 
@@ -93,7 +91,7 @@ class MainActivity : ComponentActivity() {
                 view.keepScreenOn = state.running && Prefs.getScreenOn(context)
             }
 
-            MaterialTheme {
+            Norwegian4x4Theme {
                 when {
                     state.running -> WorkoutScreen(
                         state = state,
@@ -114,6 +112,46 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+// ------------------------------------------------------------- shared bits
+
+/** Small uppercase, letter-spaced section label — the instrument-panel voice of the UI. */
+@Composable
+private fun SectionLabel(text: String, color: Color = SteelGray) {
+    Text(
+        text.uppercase(),
+        fontSize = 10.sp,
+        fontWeight = FontWeight.Bold,
+        letterSpacing = 1.5.sp,
+        color = color,
+    )
+}
+
+/** A hard 1dp rule instead of soft spacing — utilitarian, not decorative. */
+@Composable
+private fun HairlineDivider(modifier: Modifier = Modifier) {
+    Spacer(modifier.fillMaxWidth().height(1.dp).background(Hairline))
+}
+
+/** A bordered, sharp-cornered data readout: label on top, big mono value below. */
+@Composable
+private fun StatTile(label: String, value: String, valueColor: Color = IceWhite, modifier: Modifier = Modifier) {
+    Column(
+        modifier
+            .border(BorderStroke(1.dp, Hairline))
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        SectionLabel(label)
+        Text(
+            value,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            fontFamily = FontFamily.Monospace,
+            color = valueColor,
+        )
+    }
+}
+
 // --------------------------------------------------------------------- home
 
 @Composable
@@ -127,22 +165,29 @@ private fun HomeScreen(error: String?, onStart: () -> Unit, onSettings: () -> Un
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Text("Norwegian 4x4", style = MaterialTheme.typography.title3)
+        Text(
+            "NORWEGIAN 4X4",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 1.sp,
+            color = IceWhite,
+        )
         Spacer(Modifier.height(4.dp))
         Text(
-            "$intervals intervals \u2022 ~${workoutMinutes(intervals)} min",
+            "$intervals intervals • ~${workoutMinutes(intervals)} min",
             fontSize = 11.sp,
-            color = Color.Gray,
+            color = SteelGray,
         )
         Text(
-            "Work zone ${(maxHr * 0.85).toInt()}\u2013${(maxHr * 0.95).toInt()} bpm",
+            "Work zone ${(maxHr * 0.85).toInt()}–${(maxHr * 0.95).toInt()} bpm",
             fontSize = 11.sp,
-            color = ColorWork,
+            fontFamily = FontFamily.Monospace,
+            color = SignalAmber,
         )
         Spacer(Modifier.height(10.dp))
         Chip(
             onClick = onStart,
-            label = { Text("Start workout") },
+            label = { Text("START WORKOUT", fontWeight = FontWeight.Bold, letterSpacing = 0.5.sp) },
             colors = ChipDefaults.primaryChipColors(),
         )
         Spacer(Modifier.height(6.dp))
@@ -154,7 +199,7 @@ private fun HomeScreen(error: String?, onStart: () -> Unit, onSettings: () -> Un
         )
         if (error != null) {
             Spacer(Modifier.height(6.dp))
-            Text(error, fontSize = 10.sp, color = ColorSlowDown, textAlign = TextAlign.Center)
+            Text(error, fontSize = 10.sp, color = AlertRed, textAlign = TextAlign.Center)
         }
     }
 }
@@ -175,10 +220,10 @@ private fun SettingsScreen(onBack: () -> Unit) {
             .padding(horizontal = 14.dp, vertical = 28.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text("Settings", style = MaterialTheme.typography.title3)
+        SectionLabel("Settings", color = IceWhite)
         Spacer(Modifier.height(10.dp))
 
-        Text("Max heart rate", fontSize = 12.sp, color = Color.Gray)
+        SectionLabel("Max heart rate")
         Row(verticalAlignment = Alignment.CenterVertically) {
             Button(
                 onClick = { maxHr = (maxHr - 1).coerceAtLeast(120); Prefs.setMaxHr(context, maxHr) },
@@ -190,6 +235,7 @@ private fun SettingsScreen(onBack: () -> Unit) {
                 modifier = Modifier.padding(horizontal = 14.dp),
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Monospace,
             )
             Button(
                 onClick = { maxHr = (maxHr + 1).coerceAtMost(220); Prefs.setMaxHr(context, maxHr) },
@@ -198,13 +244,14 @@ private fun SettingsScreen(onBack: () -> Unit) {
             ) { Text("+", fontSize = 16.sp) }
         }
         Text(
-            "Work zone ${(maxHr * 0.85).toInt()}\u2013${(maxHr * 0.95).toInt()} bpm",
+            "Work zone ${(maxHr * 0.85).toInt()}–${(maxHr * 0.95).toInt()} bpm",
             fontSize = 10.sp,
-            color = ColorWork,
+            fontFamily = FontFamily.Monospace,
+            color = SignalAmber,
         )
         Spacer(Modifier.height(12.dp))
 
-        Text("Hard intervals", fontSize = 12.sp, color = Color.Gray)
+        SectionLabel("Hard intervals")
         Row(verticalAlignment = Alignment.CenterVertically) {
             Button(
                 onClick = { intervals = (intervals - 1).coerceAtLeast(1); Prefs.setIntervals(context, intervals) },
@@ -216,6 +263,7 @@ private fun SettingsScreen(onBack: () -> Unit) {
                 modifier = Modifier.padding(horizontal = 14.dp),
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Monospace,
             )
             Button(
                 onClick = { intervals = (intervals + 1).coerceAtMost(8); Prefs.setIntervals(context, intervals) },
@@ -226,7 +274,7 @@ private fun SettingsScreen(onBack: () -> Unit) {
         Text(
             "~${workoutMinutes(intervals)} min total",
             fontSize = 10.sp,
-            color = Color.Gray,
+            color = SteelGray,
         )
         Spacer(Modifier.height(12.dp))
 
@@ -242,14 +290,14 @@ private fun SettingsScreen(onBack: () -> Unit) {
             if (screenOn) "Display stays lit all workout (more battery)"
             else "Display dims as usual; raise wrist to check",
             fontSize = 9.sp,
-            color = Color.Gray,
+            color = SteelGray,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(12.dp))
 
         Chip(
             onClick = onBack,
-            label = { Text("Done") },
+            label = { Text("Done", fontWeight = FontWeight.Bold) },
             colors = ChipDefaults.primaryChipColors(),
         )
     }
@@ -265,24 +313,24 @@ private fun WorkoutScreen(
     onEnd: () -> Unit,
 ) {
     val phaseColor = when (state.phaseType) {
-        PhaseType.WORK -> ColorWork
-        PhaseType.RECOVERY, PhaseType.WARMUP, PhaseType.COOLDOWN -> ColorEasy
+        PhaseType.WORK -> SignalAmber
+        PhaseType.RECOVERY, PhaseType.WARMUP, PhaseType.COOLDOWN -> PhaseEasy
     }
     val guidanceColor = when {
-        state.paused -> ColorPaused
-        state.guidance == Guidance.SPEED_UP -> ColorSpeedUp
-        state.guidance == Guidance.SLOW_DOWN -> ColorSlowDown
-        state.guidance == Guidance.IN_ZONE -> ColorInZone
-        else -> Color.Gray
+        state.paused -> PausedAmber
+        state.guidance == Guidance.SPEED_UP -> FrostBlue
+        state.guidance == Guidance.SLOW_DOWN -> AlertRed
+        state.guidance == Guidance.IN_ZONE -> GlacialCyan
+        else -> SteelGray
     }
     val guidanceText = when {
         state.paused -> "PAUSED"
-        state.guidance == Guidance.SPEED_UP -> "SPEED UP \u25B2"
-        state.guidance == Guidance.SLOW_DOWN -> "SLOW DOWN \u25BC"
+        state.guidance == Guidance.SPEED_UP -> "SPEED UP ▲"
+        state.guidance == Guidance.SLOW_DOWN -> "SLOW DOWN ▼"
         state.guidance == Guidance.IN_ZONE ->
             if (state.phaseType == PhaseType.WARMUP || state.phaseType == PhaseType.COOLDOWN)
-                "EASY PACE" else "IN ZONE \u2713"
-        else -> "reading HR\u2026"
+                "EASY PACE" else "IN ZONE ✓"
+        else -> "reading HR…"
     }
 
     Column(
@@ -290,28 +338,45 @@ private fun WorkoutScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Text(state.phaseLabel, fontSize = 13.sp, color = phaseColor, fontWeight = FontWeight.Bold)
+        Text(
+            state.phaseLabel.uppercase(),
+            fontSize = 13.sp,
+            letterSpacing = 1.sp,
+            color = phaseColor,
+            fontWeight = FontWeight.Bold,
+        )
         Text(
             formatClock(state.secondsLeft),
             fontSize = 38.sp,
             fontWeight = FontWeight.Bold,
-            color = if (state.paused) ColorPaused else Color.White,
+            fontFamily = FontFamily.Monospace,
+            color = if (state.paused) PausedAmber else IceWhite,
         )
         Row(verticalAlignment = Alignment.Bottom) {
             Text(
                 if (state.hr > 0) "${state.hr}" else "--",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Monospace,
                 color = guidanceColor,
             )
-            Text(" bpm  (${state.targetLow}\u2013${state.targetHigh})", fontSize = 11.sp, color = Color.Gray)
+            Text(
+                " bpm  (${state.targetLow}–${state.targetHigh})",
+                fontSize = 11.sp,
+                fontFamily = FontFamily.Monospace,
+                color = SteelGray,
+            )
         }
-        Text(guidanceText, fontSize = 14.sp, color = guidanceColor, fontWeight = FontWeight.Bold)
+        Text(guidanceText, fontSize = 14.sp, letterSpacing = 0.5.sp, color = guidanceColor, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(3.dp))
         Row {
-            Text("${formatPace(state.speedMps)} /km", fontSize = 12.sp)
+            Text("${formatPace(state.speedMps)} /km", fontSize = 12.sp, fontFamily = FontFamily.Monospace)
             Spacer(Modifier.width(10.dp))
-            Text(String.format(java.util.Locale.US, "%.2f km", state.distanceM / 1000.0), fontSize = 12.sp)
+            Text(
+                String.format(java.util.Locale.US, "%.2f km", state.distanceM / 1000.0),
+                fontSize = 12.sp,
+                fontFamily = FontFamily.Monospace,
+            )
         }
         Spacer(Modifier.height(8.dp))
         Row {
@@ -343,31 +408,74 @@ private fun SummaryScreen(state: WorkoutState, onDone: () -> Unit) {
     var uploaded by remember { mutableStateOf(false) }
     var uploadMessage by remember { mutableStateOf<String?>(null) }
 
+    val avgPace = if (state.distanceM > 50 && state.elapsedSec > 0) {
+        formatPace(state.distanceM / state.elapsedSec)
+    } else "--:--"
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 12.dp, vertical = 24.dp),
+            .padding(horizontal = 12.dp, vertical = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
     ) {
-        Text("Workout done!", style = MaterialTheme.typography.title3, color = ColorInZone)
-        Spacer(Modifier.height(6.dp))
-        Text("Time  ${formatClock(state.elapsedSec)}", fontSize = 13.sp)
+        SectionLabel("Workout complete", color = GlacialCyan)
         Text(
-            String.format(java.util.Locale.US, "Distance  %.2f km", state.distanceM / 1000.0),
-            fontSize = 13.sp,
+            formatClock(state.elapsedSec),
+            fontSize = 30.sp,
+            fontWeight = FontWeight.Bold,
+            fontFamily = FontFamily.Monospace,
+            color = IceWhite,
         )
-        val avgPace = if (state.distanceM > 50 && state.elapsedSec > 0) {
-            formatPace(state.distanceM / state.elapsedSec)
-        } else "--:--"
-        Text("Avg pace  $avgPace /km", fontSize = 13.sp)
+        Spacer(Modifier.height(8.dp))
+
+        val summary = state.summary
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            StatTile(
+                "Distance",
+                String.format(java.util.Locale.US, "%.2f km", state.distanceM / 1000.0),
+                modifier = Modifier.weight(1f),
+            )
+            StatTile("Avg pace", "$avgPace/km", modifier = Modifier.weight(1f))
+        }
+        if (summary != null) {
+            Spacer(Modifier.height(4.dp))
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                StatTile(
+                    "Avg / Max HR",
+                    "${summary.avgHr}/${summary.maxHr}",
+                    valueColor = SignalAmber,
+                    modifier = Modifier.weight(1f),
+                )
+                StatTile(
+                    "Time in zone",
+                    "${summary.workTimeInZonePct}%",
+                    valueColor = if (summary.workTimeInZonePct >= 60) GlacialCyan else AlertRed,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+
+        if (summary != null && summary.intervals.isNotEmpty()) {
+            Spacer(Modifier.height(12.dp))
+            HairlineDivider()
+            Spacer(Modifier.height(8.dp))
+            SectionLabel("Intervals", color = IceWhite)
+            Spacer(Modifier.height(6.dp))
+            summary.intervals.forEach { interval ->
+                IntervalRow(interval)
+                Spacer(Modifier.height(6.dp))
+            }
+        }
+
+        Spacer(Modifier.height(4.dp))
+        HairlineDivider()
         Spacer(Modifier.height(8.dp))
 
         if (state.savedFile != null) {
             when {
                 uploaded -> {
-                    Text("Uploaded to Strava \u2713", fontSize = 12.sp, color = ColorInZone)
+                    Text("Uploaded to Strava ✓", fontSize = 12.sp, color = GlacialCyan)
                 }
                 StravaSecrets.isConfigured -> {
                     Chip(
@@ -382,13 +490,13 @@ private fun SummaryScreen(state: WorkoutState, onDone: () -> Unit) {
                                     context = context,
                                     file = file,
                                     name = "Norwegian 4x4",
-                                    description = "$intervals x 4 min intervals \u2022 recorded on Galaxy Watch",
+                                    description = "$intervals x 4 min intervals • recorded on Galaxy Watch",
                                 )
                                 uploading = false
                                 result
                                     .onSuccess {
                                         uploaded = true
-                                        uploadMessage = "Processing on Strava\u2026"
+                                        uploadMessage = "Processing on Strava…"
                                     }
                                     .onFailure {
                                         uploadMessage = it.message ?: "Upload failed"
@@ -397,7 +505,7 @@ private fun SummaryScreen(state: WorkoutState, onDone: () -> Unit) {
                         },
                         label = {
                             Text(
-                                if (uploading) "Uploading\u2026" else "Upload to Strava",
+                                if (uploading) "Uploading…" else "Upload to Strava",
                                 fontSize = 12.sp,
                             )
                         },
@@ -406,15 +514,15 @@ private fun SummaryScreen(state: WorkoutState, onDone: () -> Unit) {
                 }
                 else -> {
                     Text(
-                        "Sent to phone \u2713",
+                        "Sent to phone ✓",
                         fontSize = 12.sp,
-                        color = ColorInZone,
+                        color = GlacialCyan,
                         textAlign = TextAlign.Center,
                     )
                     Text(
                         "Check the notification on your phone to share it to Strava",
                         fontSize = 9.sp,
-                        color = Color.Gray,
+                        color = SteelGray,
                         textAlign = TextAlign.Center,
                     )
                 }
@@ -424,19 +532,75 @@ private fun SummaryScreen(state: WorkoutState, onDone: () -> Unit) {
                 Text(
                     it,
                     fontSize = 10.sp,
-                    color = if (uploaded) Color.Gray else ColorSlowDown,
+                    color = if (uploaded) SteelGray else AlertRed,
                     textAlign = TextAlign.Center,
                 )
             }
         } else if (state.error != null) {
-            Text(state.error, fontSize = 10.sp, color = ColorSlowDown, textAlign = TextAlign.Center)
+            Text(state.error, fontSize = 10.sp, color = AlertRed, textAlign = TextAlign.Center)
         }
 
         Spacer(Modifier.height(8.dp))
         Chip(
             onClick = onDone,
-            label = { Text("Done") },
+            label = { Text("Done", fontWeight = FontWeight.Bold) },
             colors = ChipDefaults.primaryChipColors(),
         )
+    }
+}
+
+/** One bordered row in the interval breakdown: effort stats on top, recovery on the second line. */
+@Composable
+private fun IntervalRow(interval: IntervalSummary) {
+    val zoneColor = if (interval.timeInZonePct >= 60) GlacialCyan else AlertRed
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .border(BorderStroke(1.dp, Hairline))
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+    ) {
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                "INTERVAL ${interval.index}",
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp,
+                color = SignalAmber,
+            )
+            Text(
+                "${interval.avgHr}/${interval.maxHr} bpm",
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = FontFamily.Monospace,
+                color = IceWhite,
+            )
+        }
+        Spacer(Modifier.height(2.dp))
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text(
+                "${formatPaceSec(interval.paceSecPerKm)}/km",
+                fontSize = 10.sp,
+                fontFamily = FontFamily.Monospace,
+                color = SteelGray,
+            )
+            Text(
+                "${interval.timeInZonePct}% in zone",
+                fontSize = 10.sp,
+                fontFamily = FontFamily.Monospace,
+                color = zoneColor,
+            )
+        }
+        if (interval.recoveryAvgHr > 0) {
+            Text(
+                "Recovery avg ${interval.recoveryAvgHr} • low ${interval.recoveryMinHr} bpm",
+                fontSize = 9.sp,
+                fontFamily = FontFamily.Monospace,
+                color = PhaseEasy,
+            )
+        }
     }
 }

@@ -307,6 +307,7 @@ class ExerciseService : LifecycleService() {
             elapsedSec = elapsed,
             savedFile = file?.name,
             error = if (file == null && samples.isNotEmpty()) "Could not save TCX file" else null,
+            summary = if (samples.isNotEmpty()) buildWorkoutSummary(samples, phases, maxHr) else null,
         )
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
